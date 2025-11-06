@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: dim_artists
+    description: "Dimension table for artists"
+    columns:
+      - name: artist_key
+        description: "Surrogate key for artist"
+        tests:
+          - not_null
+          - unique
+      - name: artist_id
+        description: "Natural key for artist"
+        tests:
+          - not_null
+      - name: artist_name
+        description: "Name of the artist"
+        tests:
+          - not_null
+
+  - name: dim_tracks
+    description: "Dimension table for tracks"
+    columns:
+      - name: track_key
+        description: "Surrogate key for track"
+        tests:
+          - not_null
+          - unique
+      - name: track_id
+        description: "Natural key for track"
+        tests:
+          - not_null
+
+  - name: fact_plays
+    description: "Fact table for play events"
+    columns:
+      - name: play_key
+        description: "Surrogate key for play event"
+        tests:
+          - not_null
+          - unique
+      - name: user_key
+        description: "Foreign key to users dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_users')
+              field: user_key

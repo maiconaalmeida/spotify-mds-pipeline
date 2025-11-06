@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: "{{ env_var('SNOWFLAKE_DATABASE', 'SPOTIFY_ANALYTICS') }}"
+    schema: bronze
+    tables:
+      - name: raw_plays
+        description: "Raw play events from MinIO/Kafka"
+        loaded_at_field: loaded_at
+        tags: ["bronze", "raw"]
+        columns:
+          - name: raw_data
+            description: "Raw JSON data containing play event"
+          - name: filename
+            description: "Source filename from MinIO"
+          - name: loaded_at
+            description: "Timestamp when data was loaded"
+          - name: file_date
+            description: "Date partition from file"

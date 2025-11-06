@@ -50,6 +50,7 @@ docker-compose.override.yml
 logs/
 *.log
 pipeline_orchestrator.log
+simulator.log
 
 # Airflow
 airflow.cfg

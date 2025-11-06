@@ -1,7 +1,43 @@
-version: "3.8"
+# REMOVA a linha version - ela é obsoleta
+
+x-spotify-common: &spotify-env
+  SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+  SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+  SPOTIFY_REDIRECT_URI: ${SPOTIFY_REDIRECT_URI}
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  MINIO_ENDPOINT: minio:9000
+  MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+  MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+  MYSQL_HOST: mysql
+  MYSQL_DATABASE: spotify_analytics
+  MYSQL_USER: root
+  MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+x-airflow-common: &airflow-common
+  image: apache/airflow:2.9.3
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow123@postgres:5432/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+    AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: America/Sao_Paulo
+    _AIRFLOW_DB_UPGRADE: "true"
+    _AIRFLOW_WWW_USER_CREATE: "true"
+    _AIRFLOW_WWW_USER_USERNAME: admin
+    _AIRFLOW_WWW_USER_PASSWORD: admin123
+    _AIRFLOW_WWW_USER_EMAIL: admin@spotify-analytics.com
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - ./data:/opt/airflow/data
+  networks:
+    - spotify-network
 
 services:
-  # Zookeeper
+  # --- Zookeeper & Kafka ---
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.1
     container_name: zookeeper
@@ -10,8 +46,9 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    networks:
+      - spotify-network
 
-  # Kafka
   kafka:
     image: confluentinc/cp-kafka:7.4.1
     container_name: kafka
@@ -23,15 +60,14 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - spotify-network
 
-  # Kafka UI
   kafdrop:
     image: obsidiandynamics/kafdrop:latest
     container_name: kafdrop
@@ -41,8 +77,10 @@ services:
       - "9000:9000"
     environment:
       KAFKA_BROKERCONNECT: kafka:9092
+    networks:
+      - spotify-network
 
-  # MinIO (S3 compatible storage)
+  # --- Data Lake (MinIO) ---
   minio:
     image: minio/minio:latest
     container_name: minio
@@ -55,51 +93,80 @@ services:
       - "9002:9000"
     volumes:
       - minio_data:/data
+    networks:
+      - spotify-network
 
-  # MySQL Database
+  # --- Databases ---
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow123
+      POSTGRES_DB: airflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - spotify-network
+
   mysql:
     image: mysql:8.0
-    container_name: mysql-spotify
+    container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: spotify123
       MYSQL_DATABASE: spotify_analytics
-      MYSQL_USER: spotify_user
-      MYSQL_PASSWORD: spotify123
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pspotify123"]
-      timeout: 20s
-      retries: 10
+    networks:
+      - spotify-network
 
-  # Metabase Dashboard
+  # --- Airflow Orchestration ---
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow-webserver
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow-scheduler
+    depends_on:
+      - postgres
+    command: scheduler
+
+  # --- Data Applications ---
   metabase:
-    image: metabase/metabase:latest
+    image: metabase/metabase
     container_name: metabase
     ports:
       - "3000:3000"
-    depends_on:
-      mysql:
-        condition: service_healthy
     environment:
       MB_DB_TYPE: mysql
+      MB_DB_DBNAME: spotify_analytics
       MB_DB_HOST: mysql
       MB_DB_PORT: 3306
-      MB_DB_DBNAME: spotify_analytics
       MB_DB_USER: root
       MB_DB_PASS: spotify123
-      MB_SITE_NAME: "Spotify Analytics"
-      MB_ANONYMOUS_TRACKING_ENABLED: "false"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+    networks:
+      - spotify-network
 
 volumes:
-  minio_data:
+  postgres_data:
   mysql_data:
+  minio_data:
+
+networks:
+  spotify-network:
+    driver: bridge

@@ -400,13 +400,6 @@ Tabela de componentes principais
 
 ---
 
-📸 Sugestões de capturas de tela (placeholders)
-- <!-- SCREENSHOT: Airflow UI mostrando DAG ativo — capture http://localhost:8080 with DAG spotify_pipeline expanded -->
-- <!-- SCREENSHOT: MinIO Console mostrando bucket spotify-raw -->
-- <!-- SCREENSHOT: Metabase dashboard com métricas de plays por hora -->
-- <!-- SCREENSHOT: dbt docs site / lineage gráfico -->
-
----
 
 🛠️ Estrutura do Projeto
 - src/: produtor e micro-serviços de ingestão
@@ -429,21 +422,9 @@ Tabela de componentes principais
 
 ---
 
-🤝 Contribuindo
-- Leia CONTRIBUTING.md
-- Use branches feature/* e PRs
-- Escreva testes para mudanças e atualize docs/dbt docs
-
----
-
 Licença
 MIT — veja LICENSE para detalhes.
 
 
 Este projeto simula um ambiente de produção real. Pipeline completo de dados em tempo real, pronto para uso com configuração mínima — ideal para aprendizado de Modern Data Stack.
 
-## Como rodar
-1. Copiar .env.sample para .env
-2. Rodar `docker-compose up -d`
-3. Executar `python src/main.py`
-4. Rodar testes com `pytest --cov=src tests/unit`

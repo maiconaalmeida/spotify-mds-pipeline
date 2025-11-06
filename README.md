@@ -1,7 +1,5 @@
 # Pipeline MDS Spotify
 
-# Pipeline MDS Spotify
-
 Este repositório contém um projeto exemplo que implementa um pipeline Modern Data Stack (MDS) para coletar, processar e disponibilizar dados do Spotify para análise. O objetivo deste README é explicar, de forma clara e didática, o propósito do projeto, as tecnologias e metodologias utilizadas e orientar passo a passo — como se você fosse um estudante do primeiro semestre, sem experiência prévia — para executar o projeto localmente.
 
 Sumário
@@ -186,3 +184,5 @@ Contatos e próximos passos
 - Sugestão de próximos passos para estudos: entender APIs REST, estudar SQL básico, experimentar queries no PostgreSQL e estudar DAGs simples no Airflow.
 
 Boa sorte — siga os passos com calma, verifique logs quando algo não funcionar e divida o problema em partes pequenas (extrair → transformar → carregar).
+
+⭐ Se você acha que este projeto merece, dê uma estrela. 

@@ -119,10 +119,6 @@ spotify-mds-pipeline/
 ├── requirements.txt
 └── README.md
 
-Certamente! Aqui está o arquivo README.md completo, formatado e traduzido para o português, baseado nas informações que você forneceu.
-
-Markdown
-
 # 🎧 Projeto Spotify Modern Data Stack
 
 Este projeto apresenta uma pipeline de Engenharia de Dados completa e em tempo real para análise de música do Spotify, utilizando as principais tecnologias da Modern Data Stack (MDS).

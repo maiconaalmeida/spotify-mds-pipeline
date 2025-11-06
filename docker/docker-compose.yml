@@ -1,0 +1,248 @@
+version: "3.8"
+
+x-spotify-common: &spotify-env
+  SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+  SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+  SPOTIFY_REDIRECT_URI: ${SPOTIFY_REDIRECT_URI}
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  MINIO_ENDPOINT: minio:9000
+  MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+  MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+  MYSQL_HOST: mysql
+  MYSQL_DATABASE: spotify_analytics
+  MYSQL_USER: root
+  MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+services:
+  # --- Zookeeper & Kafka ---
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - spotify-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.1
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - spotify-network
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    container_name: kafdrop
+    depends_on:
+      - kafka
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: kafka:9092
+      JVM_OPTS: -Xms32M -Xmx64M
+    networks:
+      - spotify-network
+
+  # --- Data Lake (MinIO) ---
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    command: server /data --console-address ":9001"
+    ports:
+      - "9001:9001"
+      - "9002:9000"
+    volumes:
+      - minio_data:/data
+    networks:
+      - spotify-network
+
+  # --- Databases ---
+  postgres:
+    image: postgres:15
+    container_name: airflow-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-airflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
+      POSTGRES_DB: ${POSTGRES_DB:-airflow}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - spotify-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-spotify
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-spotify123}
+      MYSQL_DATABASE: spotify_analytics
+      MYSQL_USER: ${MYSQL_USER:-spotify_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-spotify123}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - spotify-network
+
+  # --- Airflow Orchestration ---
+  airflow-init:
+    image: apache/airflow:2.9.3
+    container_name: airflow-init
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@postgres:5432/${POSTGRES_DB:-airflow}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+    entrypoint: /bin/bash
+    command: >
+      -c "
+      echo 'Waiting for PostgreSQL...' &&
+      sleep 30 &&
+      airflow db init &&
+      airflow users create --username ${AIRFLOW_ADMIN_USER:-admin} --firstname Admin --lastname User --role Admin --email ${AIRFLOW_ADMIN_EMAIL:-admin@example.com} --password ${AIRFLOW_ADMIN_PASSWORD:-admin} &&
+      echo '✅ Airflow initialized'"
+
+  airflow-webserver:
+    image: apache/airflow:2.9.3
+    container_name: airflow-webserver
+    restart: always
+    depends_on:
+      - airflow-init
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@postgres:5432/${POSTGRES_DB:-airflow}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+    ports:
+      - "8080:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - spotify-network
+
+  airflow-scheduler:
+    image: apache/airflow:2.9.3
+    container_name: airflow-scheduler
+    restart: always
+    depends_on:
+      - airflow-init
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-airflow}:${POSTGRES_PASSWORD:-airflow}@postgres:5432/${POSTGRES_DB:-airflow}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+    command: scheduler
+    networks:
+      - spotify-network
+
+  # --- Data Applications ---
+  metabase:
+    image: metabase/metabase
+    container_name: metabase
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    environment:
+      MB_DB_TYPE: mysql
+      MB_DB_DBNAME: spotify_analytics
+      MB_DB_HOST: mysql
+      MB_DB_PORT: 3306
+      MB_DB_USER: root
+      MB_DB_PASS: ${MYSQL_ROOT_PASSWORD:-spotify123}
+      MB_SITE_NAME: "Spotify Analytics"
+    networks:
+      - spotify-network
+
+  # --- Data Producer ---
+  data-producer:
+    build:
+      context: .
+      dockerfile: Dockerfile.producer
+    container_name: spotify-producer
+    depends_on:
+      - kafka
+    environment:
+      <<: *spotify-env
+      KAFKA_TOPIC: spotify-streams
+    volumes:
+      - ./data:/app/data
+    networks:
+      - spotify-network
+
+  # --- Spark Processing ---
+  spark-master:
+    image: bitnami/spark:latest
+    container_name: spark-master
+    ports:
+      - "8081:8080"
+      - "7077:7077"
+    environment:
+      - SPARK_MODE=master
+    networks:
+      - spotify-network
+
+  spark-worker:
+    image: bitnami/spark:latest
+    container_name: spark-worker
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=512M
+    networks:
+      - spotify-network
+
+volumes:
+  postgres_data:
+  mysql_data:
+  minio_data:
+
+networks:
+  spotify-network:
+    driver: bridge

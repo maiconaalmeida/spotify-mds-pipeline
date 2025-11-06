@@ -1,6 +1,6 @@
 # Spotify MDS Pipeline
 
-## Metodologia e guia para iniciantes (explicado como para um aluno do 1º semestre)
+## Metodologia e guia
 
 Objetivo: mostrar, passo a passo e sem exigir que saiba programar, como levantar o projeto, ver dados passando pela pipeline e checar resultados nas interfaces (Airflow, MinIO, Metabase).
 

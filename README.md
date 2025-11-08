@@ -1,5 +1,5 @@
-# Pipeline de Analytics em Tempo Real do Spotify
 
+# 🎵 Pipeline de Analytics em Tempo Real do Spotify
 ![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?logo=snowflake&logoColor=white)
 ![DBT](https://img.shields.io/badge/dbt-FF694B?logo=dbt&logoColor=white)
 ![Apache Airflow](https://img.shields.io/badge/Apache%20Airflow-017CEE?logo=apacheairflow&logoColor=white)
@@ -9,8 +9,6 @@
 ![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?logo=powerbi&logoColor=black)
 ![Modern Data Stack](https://img.shields.io/badge/Modern%20Data%20Stack-00C7B7?logo=databricks&logoColor=white)
 ---
-
-# 🎵 Pipeline de Analytics em Tempo Real do Spotify
 
 <div align="center">
 

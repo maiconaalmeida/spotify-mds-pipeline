@@ -10,52 +10,96 @@
 ![Modern Data Stack](https://img.shields.io/badge/Modern%20Data%20Stack-00C7B7?logo=databricks&logoColor=white)
 ---
 
-Pipeline de dados completo end-to-end para analytics de streaming do Spotify usando Modern Data Stack
-Funcionalidades • Arquitetura • Início Rápido • Documentação • Contribuindo
-🎯 Visão Geral
-Este projeto implementa um pipeline de dados em tempo real de nível produção para analytics de streaming de música do Spotify, demonstrando as melhores práticas de engenharia de dados moderna. O pipeline simula milhões de eventos de streaming, processa-os em tempo real e entrega insights acionáveis através de dashboards interativos.
-O Que Torna Este Projeto Especial?
+# 🎵 Pipeline de Analytics em Tempo Real do Spotify
 
-🚀 Totalmente Automatizado: Uma vez iniciado, o pipeline roda de forma autônoma ponta a ponta
-⚡ Processamento em Tempo Real: Latência inferior a um segundo desde geração até visualização
-🏗️ Pronto para Produção: Implementa padrões e práticas da indústria
-📦 100% Containerizado: Deploy com um único comando usando Docker Compose
-🔄 Arquitetura Medallion: Camadas de dados Bronze → Silver → Gold
-✅ Qualidade em Primeiro Lugar: Testes e validações integrados em cada etapa
+<div align="center">
 
-Valor de Negócio
+![Status Pipeline](https://img.shields.io/badge/pipeline-ativo-success)
+![Docker](https://img.shields.io/badge/docker-pronto-blue)
+![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
+![Python](https://img.shields.io/badge/python-3.9+-blue)
+
+**Pipeline de dados completo end-to-end para analytics de streaming do Spotify usando Modern Data Stack**
+
+[Funcionalidades](#-funcionalidades) • [Arquitetura](#-arquitetura) • [Início Rápido](#-início-rápido) • [Documentação](#-documentação) • [Contribuindo](#-contribuindo)
+
+</div>
+
+---
+
+## 📋 Índice
+
+- [Visão Geral](#-visão-geral)
+- [Funcionalidades](#-funcionalidades)
+- [Arquitetura](#-arquitetura)
+- [Stack Tecnológica](#-stack-tecnológica)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Pré-requisitos](#-pré-requisitos)
+- [Instalação](#-instalação)
+- [Configuração](#-configuração)
+- [Como Usar](#-como-usar)
+- [Modelo de Dados](#-modelo-de-dados)
+- [Monitoramento](#-monitoramento)
+- [Testes](#-testes)
+- [Solução de Problemas](#-solução-de-problemas)
+- [Roadmap](#-roadmap)
+- [Contribuindo](#-contribuindo)
+- [Licença](#-licença)
+
+---
+
+## 🎯 Visão Geral
+
+Este projeto implementa um **pipeline de dados em tempo real de nível produção** para analytics de streaming de música do Spotify, demonstrando as melhores práticas de engenharia de dados moderna. O pipeline simula milhões de eventos de streaming, processa-os em tempo real e entrega insights acionáveis através de dashboards interativos.
+
+### O Que Torna Este Projeto Especial?
+
+- 🚀 **Totalmente Automatizado**: Uma vez iniciado, o pipeline roda de forma autônoma ponta a ponta
+- ⚡ **Processamento em Tempo Real**: Latência inferior a um segundo desde geração até visualização
+- 🏗️ **Pronto para Produção**: Implementa padrões e práticas da indústria
+- 📦 **100% Containerizado**: Deploy com um único comando usando Docker Compose
+- 🔄 **Arquitetura Medallion**: Camadas de dados Bronze → Silver → Gold
+- ✅ **Qualidade em Primeiro Lugar**: Testes e validações integrados em cada etapa
+
+### Valor de Negócio
+
 Este pipeline responde questões críticas de negócio:
-
-📊 Quais músicas estão em alta agora?
-🌍 Quais regiões têm maior engajamento?
-📱 Como os usuários consomem conteúdo em diferentes dispositivos?
-⏰ Quais são os horários de pico de escuta?
-🎭 Quais gêneros estão ganhando popularidade?
+- 📊 Quais músicas estão em alta agora?
+- 🌍 Quais regiões têm maior engajamento?
+- 📱 Como os usuários consomem conteúdo em diferentes dispositivos?
+- ⏰ Quais são os horários de pico de escuta?
+- 🎭 Quais gêneros estão ganhando popularidade?
 
 ---
-✨ Funcionalidades
-Capacidades Principais
 
-Streaming em Tempo Real: Apache Kafka processa milhões de eventos por segundo
-Armazenamento Escalável: MinIO fornece armazenamento de objetos compatível com S3
-Data Warehouse em Nuvem: Snowflake permite analytics em escala de petabytes
-Transformação de Dados: dbt garante modelos de dados limpos, testados e documentados
-Orquestração de Workflows: Airflow gerencia dependências complexas e agendamentos
-Dashboards Interativos: Power BI entrega insights aos stakeholders
+## ✨ Funcionalidades
 
-Melhores Práticas de Engenharia de Dados
+### Capacidades Principais
 
-✅ Arquitetura Medallion (Bronze/Silver/Gold)
-✅ Processamento Incremental (apenas dados novos)
-✅ Testes de Qualidade de Dados (dbt tests)
-✅ Validação de Schema (verificações automatizadas)
-✅ Pipelines Idempotentes (execuções seguras)
-✅ Rastreamento de Linhagem (proveniência dos dados)
-✅ Documentação como Código (dbt docs)
+- **Streaming em Tempo Real**: Apache Kafka processa milhões de eventos por segundo
+- **Armazenamento Escalável**: MinIO fornece armazenamento de objetos compatível com S3
+- **Data Warehouse em Nuvem**: Snowflake permite analytics em escala de petabytes
+- **Transformação de Dados**: dbt garante modelos de dados limpos, testados e documentados
+- **Orquestração de Workflows**: Airflow gerencia dependências complexas e agendamentos
+- **Dashboards Interativos**: Power BI entrega insights aos stakeholders
+
+### Melhores Práticas de Engenharia de Dados
+
+- ✅ **Arquitetura Medallion** (Bronze/Silver/Gold)
+- ✅ **Processamento Incremental** (apenas dados novos)
+- ✅ **Testes de Qualidade de Dados** (dbt tests)
+- ✅ **Validação de Schema** (verificações automatizadas)
+- ✅ **Pipelines Idempotentes** (execuções seguras)
+- ✅ **Rastreamento de Linhagem** (proveniência dos dados)
+- ✅ **Documentação como Código** (dbt docs)
+
 ---
 
-🏗️ Arquitetura
-Diagrama de Arquitetura de Alto Nível
+## 🏗️ Arquitetura
+
+### Diagrama de Arquitetura de Alto Nível
+
+```
 ┌──────────────────────────────────────────────────────────────────────┐
 │                         GERAÇÃO DE DADOS                              │
 │  ┌────────────────────────────────────────────────────────────┐     │
@@ -157,36 +201,56 @@ Diagrama de Arquitetura de Alto Nível
 │  │  📱 Divisão Dispositivos: 60% Mobile, 25% Desktop, 15% Web │     │
 │  └──────────────────────────────────────────────────────────────┘   │
 └──────────────────────────────────────────────────────────────────────┘
+```
 
-Fluxo de Dados Explicado
+### Fluxo de Dados Explicado
 
-Geração: Simulador Python cria eventos realistas de streaming usando biblioteca Faker
-Streaming: Producer Kafka publica eventos no tópico spotify_plays
-Consumo: Consumer Kafka lê mensagens e escreve arquivos JSON no MinIO
-Ingestão: DAG do Airflow copia arquivos do MinIO para camada Bronze do Snowflake
-Transformação: Modelos dbt limpam, padronizam e agregam dados (Silver → Gold)
-Visualização: Power BI conecta à camada Gold para dashboards em tempo real
----
-🛠️ Stack Tecnológica
-Infraestrutura & Orquestração
-
-<img width="572" height="143" alt="image" src="https://github.com/user-attachments/assets/1eadc016-9711-44f4-8e35-7cf39e167e41" />
+1. **Geração**: Simulador Python cria eventos realistas de streaming usando biblioteca Faker
+2. **Streaming**: Producer Kafka publica eventos no tópico `spotify_plays`
+3. **Consumo**: Consumer Kafka lê mensagens e escreve arquivos JSON no MinIO
+4. **Ingestão**: DAG do Airflow copia arquivos do MinIO para camada Bronze do Snowflake
+5. **Transformação**: Modelos dbt limpam, padronizam e agregam dados (Silver → Gold)
+6. **Visualização**: Power BI conecta à camada Gold para dashboards em tempo real
 
 ---
 
-Streaming & Armazenamento
-<img width="559" height="217" alt="image" src="https://github.com/user-attachments/assets/2c9b8c12-b0fb-45e2-b76e-3d9426ce8453" />
+## 🛠️ Stack Tecnológica
 
----
-Processamento de Dados
-<img width="560" height="164" alt="image" src="https://github.com/user-attachments/assets/955cac64-f5ce-485c-9420-830d1cd23484" />
+### Infraestrutura & Orquestração
 
----
-Visualização
-<img width="560" height="74" alt="image" src="https://github.com/user-attachments/assets/f9512355-7192-486f-8a17-6352feb2bfec" />
+| Tecnologia | Versão | Propósito |
+|-----------|---------|-----------|
+| **Docker** | 24.0+ | Plataforma de containerização |
+| **Docker Compose** | 2.20+ | Orquestração multi-container |
+| **Apache Airflow** | 2.7+ | Orquestração e agendamento de workflows |
 
----
-Bibliotecas Python
+### Streaming & Armazenamento
+
+| Tecnologia | Versão | Propósito |
+|-----------|---------|-----------|
+| **Apache Kafka** | 3.5+ | Plataforma de streaming distribuído |
+| **Zookeeper** | 3.8+ | Coordenação de cluster Kafka |
+| **MinIO** | RELEASE.2023+ | Armazenamento de objetos compatível com S3 |
+| **Snowflake** | Enterprise | Data warehouse em nuvem |
+
+### Processamento de Dados
+
+| Tecnologia | Versão | Propósito |
+|-----------|---------|-----------|
+| **dbt (data build tool)** | 1.6+ | Transformações de dados baseadas em SQL |
+| **Python** | 3.9+ | Geração e processamento de dados |
+| **Pandas** | 2.0+ | Manipulação de dados |
+| **Faker** | 19.0+ | Geração de dados realistas |
+
+### Visualização
+
+| Tecnologia | Versão | Propósito |
+|-----------|---------|-----------|
+| **Power BI** | Desktop/Service | Dashboards de business intelligence |
+
+### Bibliotecas Python
+
+```
 faker==19.12.0
 kafka-python==2.0.2
 minio==7.1.17
@@ -194,9 +258,13 @@ pandas==2.1.3
 snowflake-connector-python==3.3.1
 apache-airflow==2.7.3
 dbt-snowflake==1.6.2
+```
+
 ---
 
-📁 Estrutura do Projeto
+## 📁 Estrutura do Projeto
+
+```
 spotify-mds-pipeline/
 │
 ├── 📁 docker/                          # Configurações Docker e Airflow
@@ -304,44 +372,58 @@ spotify-mds-pipeline/
 ├── requirements.txt                    # Dependências Python raiz
 ├── README.md                           # Este arquivo
 └── LICENSE                             # Licença do projeto
-
----
-🔧 Pré-requisitos
-Software Necessário
-
-Docker Desktop (4.20+) - Download
-Docker Compose (2.20+) - Incluído no Docker Desktop
-Git - Download
-Conta Snowflake - Cadastre-se para teste grátis
-Power BI Desktop (opcional) - Download
+```
 
 ---
 
-Requisitos de Sistema
-<img width="562" height="164" alt="image" src="https://github.com/user-attachments/assets/e97ff0d5-e1df-4f94-96f0-b04a9d41d6ff" />
+## 🔧 Pré-requisitos
+
+### Software Necessário
+
+- **Docker Desktop** (4.20+) - [Download](https://www.docker.com/products/docker-desktop)
+- **Docker Compose** (2.20+) - Incluído no Docker Desktop
+- **Git** - [Download](https://git-scm.com/downloads)
+- **Conta Snowflake** - [Cadastre-se para teste grátis](https://signup.snowflake.com/)
+- **Power BI Desktop** (opcional) - [Download](https://powerbi.microsoft.com/)
+
+### Requisitos de Sistema
+
+| Recurso | Mínimo | Recomendado |
+|----------|---------|-------------|
+| **RAM** | 8 GB | 16 GB+ |
+| **CPU** | 4 núcleos | 8 núcleos+ |
+| **Espaço em Disco** | 20 GB | 50 GB+ |
+| **SO** | Windows 10/11, macOS 11+, Linux | Versões mais recentes |
+
+### Requisitos de Rede
+
+- Conexão com internet para imagens Docker e Snowflake
+- Portas disponíveis: 8080 (Airflow), 9092 (Kafka), 9000-9001 (MinIO), 2181 (Zookeeper)
 
 ---
-Requisitos de Rede
 
-Conexão com internet para imagens Docker e Snowflake
-Portas disponíveis: 8080 (Airflow), 9092 (Kafka), 9000-9001 (MinIO), 2181 (Zookeeper)
+## 🚀 Instalação
 
----
-🚀 Instalação
-1. Clone o Repositório
-   git clone https://github.com/maiconaalmeida/spotify-mds-pipeline.git
+### 1. Clone o Repositório
+
+```bash
+git clone https://github.com/maiconaalmeida/spotify-mds-pipeline.git
 cd spotify-mds-pipeline
----
+```
 
-2. Configure as Variáveis de Ambiente
+### 2. Configure as Variáveis de Ambiente
+
+```bash
 # Copie o arquivo de exemplo
 cp .env.example .env
 
 # Edite o arquivo .env com suas credenciais
 nano .env  # ou vim, code, etc.
----
+```
 
-Variáveis Obrigatórias:
+**Variáveis Obrigatórias:**
+
+```bash
 # Configuração Snowflake
 SNOWFLAKE_ACCOUNT=seu_identificador_conta
 SNOWFLAKE_USER=seu_usuario
@@ -363,14 +445,20 @@ KAFKA_TOPIC=spotify_plays
 # Configuração Airflow
 AIRFLOW_UID=50000
 AIRFLOW__CORE__FERNET_KEY=sua_chave_fernet_aqui
+```
 
----
-3. Inicialize o Snowflake
+### 3. Inicialize o Snowflake
+
 Execute o script de setup para criar bancos de dados, schemas e tabelas:
+
+```bash
 # Conecte ao Snowflake e execute
 ./infrastructure/scripts/setup_snowflake.sql
+```
 
 Ou execute manualmente:
+
+```sql
 -- Criar banco de dados e schemas
 CREATE DATABASE IF NOT EXISTS SPOTIFY_DB;
 
@@ -397,9 +485,12 @@ CREATE WAREHOUSE IF NOT EXISTS COMPUTE_WH
     WAREHOUSE_SIZE = 'XSMALL'
     AUTO_SUSPEND = 60
     AUTO_RESUME = TRUE;
----
-4. Construa e Inicie os Serviços
-   # Construir todas as imagens Docker
+```
+
+### 4. Construa e Inicie os Serviços
+
+```bash
+# Construir todas as imagens Docker
 docker-compose build
 
 # Iniciar todos os serviços em modo detached
@@ -407,8 +498,11 @@ docker-compose up -d
 
 # Verificar status dos serviços
 docker-compose ps
+```
 
-Saída Esperada:
+**Saída Esperada:**
+
+```
 NOME                    STATUS              PORTAS
 kafka                   running             0.0.0.0:9092->9092/tcp
 zookeeper               running             0.0.0.0:2181->2181/tcp
@@ -417,13 +511,19 @@ airflow-webserver       running             0.0.0.0:8080->8080/tcp
 airflow-scheduler       running
 producer                running
 consumer                running
+```
 
----
-5. Acesse os Serviços
-   <img width="555" height="178" alt="image" src="https://github.com/user-attachments/assets/f42ef2f2-79c0-4b01-8dec-5ac43cf07ff5" />
+### 5. Acesse os Serviços
 
----
-6. Verifique a Instalação
+| Serviço | URL | Credenciais |
+|---------|-----|-------------|
+| **Airflow** | http://localhost:8080 | admin / admin |
+| **Console MinIO** | http://localhost:9001 | admin / senha_admin_minio |
+| **Kafka UI** | http://localhost:9021 | N/A (se Confluent Control Center habilitado) |
+
+### 6. Verifique a Instalação
+
+```bash
 # Verificar logs do Airflow
 docker-compose logs -f airflow-webserver
 
@@ -435,16 +535,21 @@ docker-compose exec minio mc ls minio/
 
 # Testar conexão Snowflake
 docker-compose exec airflow-webserver airflow connections test snowflake_default
+```
 
 ---
-⚙️ Configuração
-Conexões do Airflow
+
+## ⚙️ Configuração
+
+### Conexões do Airflow
+
 Configure a conexão Snowflake na UI do Airflow:
 
-Navegue até Admin → Connections
-Clique em + para adicionar nova conexão
-Preencha os detalhes:
+1. Navegue até **Admin → Connections**
+2. Clique em **+** para adicionar nova conexão
+3. Preencha os detalhes:
 
+```
 Connection Id: snowflake_default
 Connection Type: Snowflake
 Account: seu_identificador_conta
@@ -453,10 +558,13 @@ Database: SPOTIFY_DB
 Role: ACCOUNTADMIN
 Login: seu_usuario
 Password: sua_senha
+```
 
----
-Perfil dbt
-Edite spotify_dbt/profiles.yml:
+### Perfil dbt
+
+Edite `spotify_dbt/profiles.yml`:
+
+```yaml
 spotify_dbt:
   outputs:
     dev:
@@ -484,10 +592,13 @@ spotify_dbt:
       client_session_keep_alive: False
   
   target: dev
+```
 
-  ---
-  Configuração de Tópicos Kafka
+### Configuração de Tópicos Kafka
+
 Ajuste partições e replicação:
+
+```bash
 docker-compose exec kafka kafka-topics \
   --create \
   --topic spotify_plays \
@@ -495,19 +606,27 @@ docker-compose exec kafka kafka-topics \
   --partitions 3 \
   --replication-factor 1 \
   --config retention.ms=604800000  # 7 dias
+```
 
-  ---
-  🎮 Como Usar
-Iniciando o Pipeline
+---
+
+## 🎮 Como Usar
+
+### Iniciando o Pipeline
+
+```bash
 # Iniciar todos os serviços
 make start
 
 # Ou usando docker-compose
 docker-compose up -d
+```
 
----
-Monitoramento
-Ver Logs:
+### Monitoramento
+
+**Ver Logs:**
+
+```bash
 # Todos os serviços
 docker-compose logs -f
 
@@ -515,32 +634,23 @@ docker-compose logs -f
 docker-compose logs -f producer
 docker-compose logs -f consumer
 docker-compose logs -f airflow-scheduler
+```
 
----
-# Todos os serviços
-docker-compose logs -f
+**UI do Airflow:**
 
-# Serviço específico
-docker-compose logs -f producer
-docker-compose logs -f consumer
-docker-compose logs -f airflow-scheduler
+1. Abra http://localhost:8080
+2. Habilite as DAGs: `spotify_ingestion_pipeline` e `spotify_transformation_pipeline`
+3. Monitore a execução das tasks na visualização Graph ou Tree
 
----
-UI do Airflow:
+**Console MinIO:**
 
-Abra http://localhost:8080
-Habilite as DAGs: spotify_ingestion_pipeline e spotify_transformation_pipeline
-Monitore a execução das tasks na visualização Graph ou Tree
+1. Abra http://localhost:9001
+2. Navegue no bucket `spotify-raw-data`
+3. Verifique se arquivos JSON estão sendo criados
 
-Console MinIO:
+### Executando dbt Manualmente
 
-Abra http://localhost:9001
-Navegue no bucket spotify-raw-data
-Verifique se arquivos JSON estão sendo criados
-
-Executando dbt Manualmente
----
-
+```bash
 # Entrar no container Airflow
 docker-compose exec airflow-webserver bash
 
@@ -552,4 +662,3 @@ dbt run
 
 # Executar modelos específicos
 dbt run --models
-
